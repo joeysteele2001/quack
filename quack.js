@@ -1,4 +1,3 @@
-let audio_ctx;
 let active = false;
 
 let rate = 30000; // ms (average time between quacks)
@@ -14,13 +13,18 @@ let timer;
 active_btn.checked = false;
 update_rate();
 
-active_btn.addEventListener('change', async () => {
+const audio_ctx = new AudioContext();
+const track = audio_ctx.createMediaElementSource(quack);
+track.connect(audio_ctx.destination);
+audio_ctx.suspend();
+
+active_btn.addEventListener('change', () => {
     if (active_btn.checked) {
         active = true;
-        await play_quack();
+        play_quack();
     } else {
         active = false;
-        await stop_quack();
+        stop_quack();
     }
 });
 
@@ -37,22 +41,16 @@ rate_slider.addEventListener('input', () => {
     }
 });
 
-async function play_quack() {
+function play_quack() {
     console.log('quack');
 
-    if (!audio_ctx) {
-        audio_ctx = new AudioContext();
-        track = audio_ctx.createMediaElementSource(quack);
-        track.connect(audio_ctx.destination);
-    }
-
     quack.currentTime = 0.0;
-    await audio_ctx.resume();
-    await quack.play();
+    audio_ctx.resume();
+    quack.play();
 }
 
-async function stop_quack() {
-    await quack.pause();
+function stop_quack() {
+    quack.pause();
 
     if (timer) {
         clearInterval(timer);
@@ -60,19 +58,19 @@ async function stop_quack() {
     }
 
     if (audio_ctx) {
-        await audio_ctx.suspend();
+        audio_ctx.suspend();
     }
 }
 
 quack.addEventListener('ended', schedule_next_quack);
 
-async function schedule_next_quack() {
+function schedule_next_quack() {
     const time_to_next = -rate * Math.log(Math.random());
     timer = setTimeout(play_quack, time_to_next);
     console.log(time_to_next);
 
     if (time_to_next > 10000) {
-        await audio_ctx.suspend();
+        audio_ctx.suspend();
     }
 }
 
