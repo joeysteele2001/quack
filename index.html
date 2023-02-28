@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Arbitrarily Long Silence Occasionally Interrupted by Quacking</title>
+</head>
+
+<body>
+    <header>
+        <h1>Arbitrarily Long Silence <br /> Occasionally Interrupted by Quacking</h1>
+        <div class="subtitle">Joey Steele</div>
+    </header>
+
+    <form>
+        <div class="quack-controls">
+            <audio src="quack.mp3" id="quack" crossorigin="anonymous"></audio>
+            <div>
+                <label for="active">Activate Quacking</label>
+                <input type="checkbox" name="active" id="active">
+            </div>
+            <div>
+                <label for="quack-rate">Average Quack Rate</label>
+                <input type="range" name="quack-rate" id="quack-rate" value="30" min="5" max="300" step="5">
+                <label for="quack-rate" id="quack-rate-label"><span id="quack-rate-disp"></span> seconds per
+                    quack</label>
+            </div>
+        </div>
+    </form>
+
+    <picture>
+        <source srcset="duck.webp">
+        <source srcset="duck.jpg">
+        <img src="duck.jpg" alt="A mallard duck.">
+    </picture>
+
+    <script src="quack.js"></script>
+</body>
+
+</html>
