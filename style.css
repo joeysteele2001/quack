@@ -1,6 +1,6 @@
 body {
     font-family: Arial, Helvetica, sans-serif;
-    max-width: 50rem;
+    max-width: min(50rem, 100%);
     margin: auto;
 }
 
@@ -41,5 +41,5 @@ picture {
 img {
     display: block;
     margin: auto;
-    max-width: 30rem;
+    max-width: min(30rem, 90%);
 }
