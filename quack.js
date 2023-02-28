@@ -1,3 +1,5 @@
+const MAX_QUACK_SPACING = 30 * 60 * 1000; // 30 mins
+
 let active = false;
 
 let rate = 30000; // ms (average time between quacks)
@@ -65,13 +67,20 @@ function stop_quack() {
 quack.addEventListener('ended', schedule_next_quack);
 
 function schedule_next_quack() {
-    const time_to_next = -rate * Math.log(Math.random());
-    timer = setTimeout(play_quack, time_to_next);
-    console.log(time_to_next);
+    const delay = time_to_next();
+    timer = setTimeout(play_quack, delay);
+    console.log(delay);
 
     if (time_to_next > 10000) {
         audio_ctx.suspend();
     }
+}
+
+function time_to_next() {
+    // ensures that the generated time doesn't exceed MAX_QUACK_SPACING
+    const x_upper_bound = 1 - Math.exp(-MAX_QUACK_SPACING / rate);
+    const random_val = Math.random() / x_upper_bound;
+    return -rate * Math.log(1 - random_val);
 }
 
 function update_rate() {
