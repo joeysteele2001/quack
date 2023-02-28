@@ -10,15 +10,11 @@ const rate_slider = document.querySelector('#quack-rate');
 const rate_disp = document.querySelector('#quack-rate-disp');
 
 let timer;
+let audio_ctx;
 
 // audio is never active until user interacts with the page
 active_btn.checked = false;
 update_rate();
-
-const audio_ctx = new AudioContext();
-const track = audio_ctx.createMediaElementSource(quack);
-track.connect(audio_ctx.destination);
-audio_ctx.suspend();
 
 active_btn.addEventListener('change', () => {
     if (active_btn.checked) {
@@ -44,6 +40,12 @@ rate_slider.addEventListener('input', () => {
 });
 
 function play_quack() {
+    if (!audio_ctx) {
+        audio_ctx = new AudioContext();
+        const track = audio_ctx.createMediaElementSource(quack);
+        track.connect(audio_ctx.destination);
+    }
+
     console.log('quack');
 
     quack.currentTime = 0.0;
