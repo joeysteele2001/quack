@@ -1,4 +1,7 @@
 const MAX_QUACK_SPACING = 30 * 60 * 1000; // 30 mins
+const QUACK_DELAY_TIME = 0.1; // seconds, for delay effect
+const QUACK_DELAY_PROBABILITY = 0.3; // probability, between 0 and 1
+const QUACK_FDBK = 0.7; // between 0 and 1
 
 let active = false;
 
@@ -11,6 +14,7 @@ const rate_disp = document.querySelector('#quack-rate-disp');
 
 let timer;
 let audio_ctx;
+let gain_node;
 
 // audio is never active until user interacts with the page
 active_btn.checked = false;
@@ -39,11 +43,15 @@ rate_slider.addEventListener('input', () => {
     }
 });
 
-function play_quack() {
+function play_quack(delay = false) {
     if (!audio_ctx) {
-        audio_ctx = new AudioContext();
-        const track = audio_ctx.createMediaElementSource(quack);
-        track.connect(audio_ctx.destination);
+        build_audio_graph();
+    }
+
+    if (delay) {
+        gain_node.gain.value = QUACK_FDBK;
+    } else {
+        gain_node.gain.value = 0;
     }
 
     console.log('quack');
@@ -69,9 +77,10 @@ function stop_quack() {
 quack.addEventListener('ended', schedule_next_quack);
 
 function schedule_next_quack() {
-    const delay = time_to_next();
-    timer = setTimeout(play_quack, delay);
-    console.log(delay);
+    const time = time_to_next();
+    const delay = Math.random() < QUACK_DELAY_PROBABILITY;
+    timer = setTimeout(() => play_quack(delay), time);
+    console.log(time);
 
     if (time_to_next > 10000) {
         audio_ctx.suspend();
@@ -88,4 +97,34 @@ function time_to_next() {
 function update_rate() {
     rate = rate_slider.value * 1000.0;
     rate_disp.textContent = rate / 1000.0;
+}
+
+function build_audio_graph() {
+    //
+    //     quack        +---+                            
+    //     audio ------>| + |-------------+------> output
+    //    source        +---+             |              
+    //                    ^               |              
+    //                    |               v              
+    //                    |          +---------+         
+    //                 +-----+       |         |         
+    //                 | * A |<------|  delay  |         
+    //                 +-----+       |         |         
+    //                               +---------+         
+    //
+
+    audio_ctx = new AudioContext();
+
+    const track = audio_ctx.createMediaElementSource(quack);
+    const delay = new DelayNode(audio_ctx, { delayTime: 0.1 });
+    const gain = new GainNode(audio_ctx, { gain: 0.7 });
+    const add = new GainNode(audio_ctx, { gain: 1 });
+
+    track.connect(add);
+    add.connect(delay);
+    add.connect(audio_ctx.destination);
+    delay.connect(gain);
+    gain.connect(add);
+
+    gain_node = gain;
 }
