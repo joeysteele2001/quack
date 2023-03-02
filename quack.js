@@ -4,6 +4,7 @@ const QUACK_DELAY_PROBABILITY = 0.3; // probability, between 0 and 1
 const QUACK_FDBK = 0.7; // between 0 and 1
 
 let active = false;
+let delay_enabled = true;
 
 let rate = 30000; // ms (average time between quacks)
 
@@ -11,6 +12,7 @@ const quack = document.querySelector('#quack');
 const active_btn = document.querySelector('#active');
 const rate_slider = document.querySelector('#quack-rate');
 const rate_disp = document.querySelector('#quack-rate-disp');
+const delay_btn = document.querySelector('#delay');
 
 let timer;
 let audio_ctx;
@@ -18,6 +20,7 @@ let gain_node;
 
 // audio is never active until user interacts with the page
 active_btn.checked = false;
+delay_btn.checked = true;
 update_rate();
 
 active_btn.addEventListener('change', () => {
@@ -43,12 +46,20 @@ rate_slider.addEventListener('input', () => {
     }
 });
 
+delay_btn.addEventListener('change', () => {
+    if (delay_btn.checked) {
+        delay_enabled = true;
+    } else {
+        delay_enabled = false;
+    }
+});
+
 function play_quack(delay = false) {
     if (!audio_ctx) {
         build_audio_graph();
     }
 
-    if (delay) {
+    if (delay && delay_enabled) {
         gain_node.gain.value = QUACK_FDBK;
     } else {
         gain_node.gain.value = 0;
