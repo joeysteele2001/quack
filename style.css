@@ -43,3 +43,7 @@ img {
     margin: auto;
     max-width: min(30rem, 90%);
 }
+
+#duck-pic {
+    filter: contrast(100%) blur(0);
+}
