@@ -44,6 +44,14 @@
         <img src="duck.jpg" id="duck-pic" alt="A mallard duck.">
     </picture>
 
+    <form class="quack-controls">
+        <div>
+            <label for="volume">Volume</label>
+            <input type="range" name="volume" id="volume" value="100" min="0" max="100" step="1">
+            <label for="volume" id="volume-label"><span id="volume-disp"></span>%</label>
+        </div>
+    </form>
+
     <script src="quack.js"></script>
 </body>
 

@@ -18,16 +18,20 @@ const rate_slider = document.querySelector('#quack-rate');
 const rate_disp = document.querySelector('#quack-rate-disp');
 const delay_btn = document.querySelector('#delay');
 const duck_pic = document.querySelector('#duck-pic');
+const volume_slider = document.querySelector('#volume');
+const volume_disp = document.querySelector('#volume-disp');
 
 let timer;
 let audio_ctx;
 let gain_node;
 let ws_node;
+let add_node;
 
 // audio is never active until user interacts with the page
 active_btn.checked = false;
 delay_btn.checked = true;
 update_rate();
+update_volume_disp();
 
 active_btn.addEventListener('change', () => {
     if (active_btn.checked) {
@@ -62,9 +66,14 @@ delay_btn.addEventListener('change', () => {
 
 quack.addEventListener('ended', () => { duck_pic.style.filter = 'contrast(100%) blur(0)'; });
 
+volume_slider.addEventListener('input', () => {
+    update_volume();
+})
+
 function play_quack(delay = false, cursed = false) {
     if (!audio_ctx) {
         build_audio_graph();
+        update_volume();
     }
 
     let contrast = '100%';
@@ -132,6 +141,18 @@ function update_rate() {
     rate_disp.textContent = rate / 1000.0;
 }
 
+function update_volume_disp() {
+    const vol = volume_slider.value;
+    volume_disp.textContent = vol;
+    return vol;
+}
+
+function update_volume() {
+    const vol = update_volume_disp();
+    const gain = (10.0 ** ((vol - 100) / 40)) - 0.00001;
+    add_node.gain.value = gain;
+}
+
 function build_audio_graph() {
     //
     //     quack        +---+                            
@@ -163,4 +184,5 @@ function build_audio_graph() {
 
     gain_node = gain;
     ws_node = ws;
+    add_node = add;
 }
